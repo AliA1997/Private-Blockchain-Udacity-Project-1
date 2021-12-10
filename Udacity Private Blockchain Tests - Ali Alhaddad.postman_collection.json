@@ -1,0 +1,125 @@
+{
+	"info": {
+		"_postman_id": "5ca568af-2bb8-4e04-8850-903dff8b860e",
+		"name": "Udacity Private Blockchain Tests - Ali Alhaddad",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Genesis Block",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/block/height/0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"block",
+						"height",
+						"0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request Ownership Message",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\": \"mh91DyJx2HSizettWXPWpoQuv74NY998F5\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/requestValidation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"requestValidation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit Star",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\": \"mh91DyJx2HSizettWXPWpoQuv74NY998F5\",\r\n    \"signature\": \"IL3KRgNZnEtTEB91DLk1Z67YfCEIuT9B/KxVfB6GqqMfaRT4xiRaCEk56CBb5XladHfyJyzP/+q7rutLykf7q9Q=\",\r\n    \"message\": \"mh91DyJx2HSizettWXPWpoQuv74NY998F5:1639097901:starRegistry\",\r\n    \"star\": \"Test Star 2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/submitstar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"submitstar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Chain",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/validateChain",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"validateChain"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Star By Address",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/blocks/mh91DyJx2HSizettWXPWpoQuv74NY998F5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"blocks",
+						"mh91DyJx2HSizettWXPWpoQuv74NY998F5"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
