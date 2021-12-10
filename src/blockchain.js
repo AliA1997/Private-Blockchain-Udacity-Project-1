@@ -224,8 +224,8 @@ class Blockchain {
     return new Promise(async (resolve, reject) => {
       self.chain.forEach(async (bl, blIdx) => {
         try {
-            console.log("BLOCK INDEX:", blIdx);
-            console.log("BLOCK:", bl);
+          console.log("BLOCK INDEX:", blIdx);
+          console.log("BLOCK:", bl);
           if (blIdx != 0) {
             if (!bl.previousBlockHash)
               errorLog.push(
