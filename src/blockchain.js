@@ -11,8 +11,8 @@
 const SHA256 = require("crypto-js/sha256");
 const BlockClass = require("./block.js");
 const bitcoinMessage = require("bitcoinjs-message");
-const bitcoinLib = require('bitcoinjs-lib');
-const Promise = require('bluebird');
+const bitcoinLib = require("bitcoinjs-lib");
+// const Promise = requ/ire("bluebird");
 
 class Blockchain {
   /**
@@ -75,7 +75,7 @@ class Blockchain {
         block.hash = SHA256(JSON.stringify(block)).toString();
         this.chain.push(block);
         await this.validateChain();
-        resolve(true);
+        resolve(block);
       } catch (error) {
         const isValidateChainError =
           Array.isArray(error) &&
@@ -131,24 +131,28 @@ class Blockchain {
       );
       let timeDiffBetweenMessageTimeAndCurrTime = currentTime - messageTime;
 
-      timeDiffBetweenMessageTimeAndCurrTime /= 1000;
-      const timeDiffInSeconds = Math.round(timeDiffBetweenMessageTimeAndCurrTime % 60);
-
+      const timeDiffInSeconds = Math.round(
+        timeDiffBetweenMessageTimeAndCurrTime % 60
+      );
+      console.log("timeDiffInSeconds:", timeDiffInSeconds);
       if (timeDiffInSeconds < 300) {
         let signatureMatchesMessage;
-        if(!signature) {
-            var keyPair = bitcoinLib.ECPair.fromWIF(address, bitcoinLib.networks.testnet)
-            console.log("KEY PAIR:", keyPair);
+        if (!signature) {
+          var keyPair = bitcoinLib.ECPair.fromWIF(
+            address,
+            bitcoinLib.networks.testnet
+          );
+          console.log("KEY PAIR:", keyPair);
         } else {
-            signatureMatchesMessage = bitcoinMessage.verify(
-              message,
-              address,
-              signature
-            );
+          signatureMatchesMessage = bitcoinMessage.verify(
+            message,
+            address,
+            signature
+          );
         }
-        console.log("signatureMatchesMessage:", signatureMatchesMessage)
+        console.log("signatureMatchesMessage:", signatureMatchesMessage);
         if (signatureMatchesMessage) {
-          const block = new BlockClass.Block({data: {star, message}});
+          const block = new BlockClass.Block({ data: { star, message } });
           resolve(self._addBlock(block));
         } else {
           reject(new Error(`Signature was not valid.`));
@@ -179,10 +183,10 @@ class Blockchain {
    * with the height equal to the parameter `height`
    * @param {*} height
    */
-  getBlockByHeight(hash) {
+  getBlockByHeight(height) {
     let self = this;
     return new Promise((resolve, reject) => {
-      let block = self.chain.filter((p) => p.hash === hash);
+      let block = self.chain.filter((p) => p.height === height);
       if (block.length) {
         resolve(block[0]);
       } else {
@@ -201,14 +205,20 @@ class Blockchain {
     let self = this;
     let stars = [];
     return new Promise((resolve, reject) => {
-      return Promise.each(self.chain, async (bl) => {
-        if(bl.previousBlockHash) {
-          const bData = await bl.getBData();
-          console.log('Block Data:', bData);
-          if (bData.data && bData.data.message && bData.data.message.split(":")[0] == address) stars.push(bData);
+      self.chain.forEach((bl) => {
+        if (bl.previousBlockHash) {
+          return bl.getBData().then((blData) => {
+            console.log("Block Data:", blData);
+            if (
+              blData.data &&
+              blData.data.message &&
+              blData.data.message.split(":")[0] == address
+            )
+              stars.push(blData);
+          });
         }
-      })
-      .then(_ => resolve(stars));
+        resolve(stars);
+      });
     });
   }
 
@@ -222,18 +232,22 @@ class Blockchain {
     let self = this;
     let errorLog = [];
     return new Promise(async (resolve, reject) => {
-      self.chain.forEach(async (bl, blIdx) => {
+      self.chain.forEach((bl, blIdx, arr) => {
         try {
           console.log("BLOCK INDEX:", blIdx);
           console.log("BLOCK:", bl);
           if (blIdx != 0) {
-            if (!bl.previousBlockHash)
+            const isBlockInCorrectOrder =
+              bl.previousBlockHash != arr[blIdx - 1].hash;
+            if (isBlockInCorrectOrder)
               errorLog.push(
                 `validateChain:Block with a hash of ${bl.hash} does not have a previousBlockHash`
               );
           }
-          const isBlockValid = await bl.validate();
-          if (!isBlockValid) errorLog.push(`validateChain:Block is not valid`);
+          return bl.validate().then((isBlockValid) => {
+            if (!isBlockValid)
+              errorLog.push(`validateChain:Block is not valid`);
+          });
         } catch (error) {
           errorLog.push(error);
         }
